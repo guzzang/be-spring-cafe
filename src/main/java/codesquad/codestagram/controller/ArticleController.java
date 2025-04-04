@@ -3,6 +3,7 @@ package codesquad.codestagram.controller;
 
 import codesquad.codestagram.dto.RequestArticleDto;
 import codesquad.codestagram.service.ArticleService;
+import codesquad.codestagram.session.SessionConst;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,27 +24,39 @@ public class ArticleController {
 
     @GetMapping("/articles")
     public String getArticleForm(HttpSession session){
-        if(session == null){
+        User loginUser = (User)session.getAttribute(SessionConst.LOGIN_USER);
+        if(loginUser == null){
             return "user/login";
         }
         return "qna/form.html";
     }
 
     @PostMapping("/articles")
-    public String writeArticle(@ModelAttribute RequestArticleDto requestArticle) {
+    public String writeArticle(@ModelAttribute RequestArticleDto requestArticle, HttpSession session) {
+        User loginUser = (User)session.getAttribute(SessionConst.LOGIN_USER);
+        if(loginUser == null){
+            return "user/login";
+        }
+
         articleService.save(requestArticle);
         return "redirect:/";
     }
 
-    @GetMapping("/articles/edit/{userId}/{articleId}")
-    public String showArticleEditForm(@PathVariable Long userId,
-                                      @PathVariable Long articleId,
+    @GetMapping("/articles/edit/{articleId}")
+    public String showArticleEditForm(@PathVariable Long articleId,
                                       Model model,
                                       HttpSession session,
                                       RedirectAttributes redirectAttributes) {
-        User loginUser = (User) session.getAttribute("loginUser");
-        if(loginUser.getId().equals(userId)){
-            model.addAttribute("article", articleService.findById(articleId));
+        User loginUser = (User) session.getAttribute(SessionConst.LOGIN_USER);
+
+        if(loginUser == null){
+            return "user/login";
+        }
+
+        Article article = articleService.findById(articleId);
+
+        if(loginUser.getId().equals(article.getUser().getId())){
+            model.addAttribute("article", article);
             return "article/edit";
         }
 
@@ -53,9 +66,23 @@ public class ArticleController {
 
     @PutMapping("/articles/{articleId}")
     public String editArticle(@ModelAttribute RequestArticleDto editArticleInfo,
-                              @PathVariable Long articleId) {
-        articleService.edit(articleId, editArticleInfo);
-        return "redirect:/";
+                              @PathVariable Long articleId,
+                              HttpSession session,
+                              RedirectAttributes redirectAttributes) {
+        User loginUser = (User) session.getAttribute(SessionConst.LOGIN_USER);
+        if(loginUser == null){
+            return "user/login";
+        }
+
+        Article article = articleService.findById(articleId);
+
+        if(loginUser.getId().equals(article.getUser().getId())){
+            articleService.edit(articleId, editArticleInfo);
+            return "redirect:/articles/" + articleId;
+        }
+
+        redirectAttributes.addFlashAttribute("errorMessage", "본인이 작성한 글만 수정할 수 있습니다.");
+        return "redirect:/articles/edit/" + articleId;
     }
 
     @DeleteMapping("/articles/{articleId}")
@@ -63,7 +90,11 @@ public class ArticleController {
                                 HttpSession session,
                                 RedirectAttributes redirectAttributes){
         Article article = articleService.findById(articleId);
-        User loginUser = (User) session.getAttribute("loginUser");
+        User loginUser = (User) session.getAttribute(SessionConst.LOGIN_USER);
+
+        if(loginUser == null){
+            return "user/login";
+        }
 
         if(article.getUser().getId().equals(loginUser.getId())){
             articleService.delete(article);
