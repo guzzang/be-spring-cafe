@@ -3,6 +3,7 @@ package codesquad.codestagram.controller;
 
 import codesquad.codestagram.dto.RequestArticleDto;
 import codesquad.codestagram.service.ArticleService;
+import codesquad.codestagram.service.ReplyService;
 import codesquad.codestagram.session.SessionConst;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
@@ -18,8 +19,11 @@ public class ArticleController {
 
     private final ArticleService articleService;
 
-    public ArticleController(ArticleService articleService) {
+    private final ReplyService replyService;
+
+    public ArticleController(ArticleService articleService, ReplyService replyService) {
         this.articleService = articleService;
+        this.replyService = replyService;
     }
 
     @GetMapping("/articles")
@@ -118,7 +122,9 @@ public class ArticleController {
     @GetMapping("/articles/{id}")
     public String showArticle(@PathVariable Long id, Model model){
         Article article = articleService.findById(id);
+        List<Reply> replyList = replyService.findByArticleId(article.getId());
         model.addAttribute("article", article);
+        model.addAttribute("replies", replyList);
         return "article/show";
     }
 
