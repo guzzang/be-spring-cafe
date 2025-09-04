@@ -6,10 +6,12 @@ import codesquad.codestagram.dto.RequestArticleDto;
 import codesquad.codestagram.repository.ArticleRepository;
 import codesquad.codestagram.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @Transactional
@@ -38,8 +40,9 @@ public class ArticleService {
         article.setContents(requestArticleDto.getContents());
     }
 
-    public List<Article> findAll() {
-        return articleRepository.findAll();
+    public Page<Article> findAll(int page) {
+        Pageable pageable = PageRequest.of(page, 15, Sort.by("createdAt").descending());
+        return articleRepository.findAll(pageable);
     }
 
     public Article findById(Long id){

@@ -6,16 +6,14 @@ import codesquad.codestagram.service.ArticleService;
 import codesquad.codestagram.service.ReplyService;
 import codesquad.codestagram.session.SessionConst;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.List;
-
 @Controller
 public class ArticleController {
-
 
     private final ArticleService articleService;
 
@@ -111,24 +109,27 @@ public class ArticleController {
 
 
     @GetMapping("/")
-    public String showArticles(Model model){
+    public String showArticles(@RequestParam(defaultValue = "0") int page, Model model){
+        Page<Article> articleList = articleService.findAll(page);
 
-        List<Article> articleList = articleService.findAll();
-        model.addAttribute("articles", articleList);
+        model.addAttribute("articles", articleList.getContent());
+        model.addAttribute("page", page);
+        model.addAttribute("totalPages", articleList.getTotalPages());
+
         return "article/index";
     }
 
-
     @GetMapping("/articles/{id}")
-    public String showArticle(@PathVariable Long id, Model model){
+    public String showArticle(@PathVariable Long id, @RequestParam(defaultValue = "0") int page, Model model){
         Article article = articleService.findById(id);
-        List<Reply> replyList = replyService.findByArticleId(article.getId());
+        Page<Reply> replyList = replyService.findByArticleId(article.getId(), page);
+
         model.addAttribute("article", article);
-        model.addAttribute("replies", replyList);
+        model.addAttribute("replies", replyList.getContent());
+        model.addAttribute("page", page);
+        model.addAttribute("totalPages", replyList.getTotalPages());
+
         return "article/show";
     }
-
-
-
 
 }

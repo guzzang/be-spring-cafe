@@ -8,9 +8,10 @@ import codesquad.codestagram.repository.ArticleRepository;
 import codesquad.codestagram.repository.ReplyRepository;
 import codesquad.codestagram.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class ReplyService {
@@ -36,16 +37,16 @@ public class ReplyService {
     }
 
     public Reply findByReplyId(Long replyId) {
-        Reply reply = replyRepository.findById(replyId)
+        return replyRepository.findById(replyId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 댓글을 찾을 수 없습니다."));
-        return reply;
     }
 
     public void delete(Reply reply){
         replyRepository.delete(reply);
     }
 
-    public List<Reply> findByArticleId(Long articleId) {
-        return replyRepository.findByArticleId(articleId);
+    public Page<Reply> findByArticleId(Long articleId, int page) {
+        PageRequest pageable = PageRequest.of(page, 5, Sort.by("createdAt").descending());
+        return replyRepository.findByArticleId(articleId, pageable);
     }
 }
