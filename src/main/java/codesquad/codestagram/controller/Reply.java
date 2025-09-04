@@ -1,9 +1,10 @@
 package codesquad.codestagram.controller;
 
+import codesquad.codestagram.config.BaseTimeEntity;
 import jakarta.persistence.*;
 
 @Entity
-public class Reply {
+public class Reply extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

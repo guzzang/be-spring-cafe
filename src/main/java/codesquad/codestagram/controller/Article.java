@@ -1,10 +1,11 @@
 package codesquad.codestagram.controller;
 
 
+import codesquad.codestagram.config.BaseTimeEntity;
 import jakarta.persistence.*;
 
 @Entity
-public class Article {
+public class Article extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -63,4 +64,5 @@ public class Article {
     public void setContents(String contents) {
         this.contents = contents;
     }
+
 }

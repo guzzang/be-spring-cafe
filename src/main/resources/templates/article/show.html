@@ -101,7 +101,7 @@
                       </div>
                       <div class="article-header-text">
                           <a href="/users/92/kimmunsu" class="article-author-name" th:text="${article.writer}"></a>
-                          <a href="/questions/413" class="article-header-time" title="퍼머링크">
+                          <a href="/questions/413" class="article-header-time" th:text="${article.updatedAt != null ? article.updatedAt : article.createdAt}" title="퍼머링크">
                               2015-12-30 01:47
                               <i class="icon-link"></i>
                           </a>
@@ -180,6 +180,14 @@
                           <p class="text-center text-danger">댓글을 보려면 로그인하세요.</p>
                           <a href="/users/login" class="btn btn-primary">로그인</a>
                       </th:block>
+
+                      <div class="pagination">
+                          <a th:if="${page > 0}" th:href="@{/articles/{id}(id=${article.id}, page=${page - 1})}">이전</a>
+
+                          <span th:text="${page + 1} + ' / ' + ${totalPages}"></span>
+
+                          <a th:if="${page + 1 < totalPages}" th:href="@{/articles/{id}(id=${article.id}, page=${page + 1})}">다음</a>
+                      </div>
 
                   </div>
               </div>
