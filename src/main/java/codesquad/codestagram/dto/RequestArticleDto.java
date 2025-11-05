@@ -1,7 +1,7 @@
 package codesquad.codestagram.dto;
 
-import codesquad.codestagram.controller.Article;
-import codesquad.codestagram.controller.User;
+import codesquad.codestagram.entity.Article;
+import codesquad.codestagram.entity.User;
 
 public class RequestArticleDto {
 
