@@ -108,6 +108,10 @@
                               <i class="icon-add-comment"></i>
                               <span class="time" th:text="${#temporals.format(article.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
                               <span th:text="${article.writer}">작성자</span>
+                              <!-- 조회수 / 추천수 표시 -->
+                              <span class="article-stats">
+                             조회수: <span th:text="${article.readCount}"></span>
+                          </span>
                           </div>
                           <div class="reply" title="댓글">
                               <i class="icon-reply"></i>
