@@ -1,6 +1,8 @@
 package codesquad.codestagram.controller;
 
 import codesquad.codestagram.dto.RequestReplyDto;
+import codesquad.codestagram.entity.Reply;
+import codesquad.codestagram.entity.User;
 import codesquad.codestagram.service.ReplyService;
 import codesquad.codestagram.session.SessionConst;
 import jakarta.servlet.http.HttpSession;

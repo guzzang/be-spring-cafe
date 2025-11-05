@@ -1,5 +1,6 @@
 package codesquad.codestagram.controller;
 
+import codesquad.codestagram.entity.User;
 import codesquad.codestagram.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

@@ -1,9 +1,9 @@
 package codesquad.codestagram.controller;
 
 import codesquad.codestagram.dto.LoginForm;
+import codesquad.codestagram.entity.User;
 import codesquad.codestagram.service.LoginService;
 import codesquad.codestagram.session.SessionConst;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
@@ -36,6 +36,7 @@ public class LoginController {
             return "user/login";
         }
 
+        // 1. id, password 확인
         User user = loginService.login(loginForm.getUserId(), loginForm.getPassword());
 
         if(user == null){
@@ -43,8 +44,8 @@ public class LoginController {
             return "user/login";
         }
 
+        // 2. 로그인 성공 -> 세션에 user 등록
         session.setAttribute(SessionConst.LOGIN_USER, user);
-
 
         return "redirect:/";
     }

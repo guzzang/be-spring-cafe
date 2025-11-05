@@ -1,8 +1,8 @@
 package codesquad.codestagram.service;
 
-import codesquad.codestagram.controller.Article;
-import codesquad.codestagram.controller.Reply;
-import codesquad.codestagram.controller.User;
+import codesquad.codestagram.entity.Article;
+import codesquad.codestagram.entity.Reply;
+import codesquad.codestagram.entity.User;
 import codesquad.codestagram.dto.RequestReplyDto;
 import codesquad.codestagram.repository.ArticleRepository;
 import codesquad.codestagram.repository.ReplyRepository;
