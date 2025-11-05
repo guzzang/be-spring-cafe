@@ -1,7 +1,12 @@
 package codesquad.codestagram.controller;
 
 
+import codesquad.codestagram.argumentresolver.RequestIp;
 import codesquad.codestagram.dto.RequestArticleDto;
+import codesquad.codestagram.dto.ResponseArticleDto;
+import codesquad.codestagram.entity.Article;
+import codesquad.codestagram.entity.Reply;
+import codesquad.codestagram.entity.User;
 import codesquad.codestagram.service.ArticleService;
 import codesquad.codestagram.service.ReplyService;
 import codesquad.codestagram.session.SessionConst;
@@ -16,7 +21,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class ArticleController {
 
     private final ArticleService articleService;
-
     private final ReplyService replyService;
 
     public ArticleController(ArticleService articleService, ReplyService replyService) {
@@ -120,11 +124,11 @@ public class ArticleController {
     }
 
     @GetMapping("/articles/{id}")
-    public String showArticle(@PathVariable Long id, @RequestParam(defaultValue = "0") int page, Model model){
-        Article article = articleService.findById(id);
-        Page<Reply> replyList = replyService.findByArticleId(article.getId(), page);
+    public String showArticle(@PathVariable Long id, @RequestIp String clientIp, @RequestParam(defaultValue = "0") int page, Model model){
+        ResponseArticleDto article = articleService.findSingleArticle(id, clientIp);
+        Page<Reply> replyList = replyService.findByArticleId(id, page);
 
-        model.addAttribute("article", article);
+        model.addAttribute("article", article.getArticle());
         model.addAttribute("replies", replyList.getContent());
         model.addAttribute("page", page);
         model.addAttribute("totalPages", replyList.getTotalPages());

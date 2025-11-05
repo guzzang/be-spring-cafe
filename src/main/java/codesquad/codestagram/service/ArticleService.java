@@ -1,8 +1,10 @@
 package codesquad.codestagram.service;
 
-import codesquad.codestagram.controller.Article;
-import codesquad.codestagram.controller.User;
 import codesquad.codestagram.dto.RequestArticleDto;
+import codesquad.codestagram.dto.ResponseArticleDto;
+import codesquad.codestagram.entity.Article;
+import codesquad.codestagram.entity.User;
+import codesquad.codestagram.repository.ArticleRecommendRepository;
 import codesquad.codestagram.repository.ArticleRepository;
 import codesquad.codestagram.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -19,11 +21,14 @@ public class ArticleService {
 
     private final ArticleRepository articleRepository;
     private final UserRepository userRepository;
+    private final ArticleRecommendRepository articleRecommendRepository;
+    private final RedisService redisService;
 
-    public ArticleService(ArticleRepository articleRepository, UserRepository userRepository) {
-
+    public ArticleService(RedisService redisService, ArticleRepository articleRepository, UserRepository userRepository, ArticleRecommendRepository articleRecommendRepository) {
         this.articleRepository = articleRepository;
         this.userRepository = userRepository;
+        this.articleRecommendRepository = articleRecommendRepository;
+        this.redisService = redisService;
     }
 
     public void save(RequestArticleDto requestArticleDto) {
@@ -40,17 +45,33 @@ public class ArticleService {
         article.setContents(requestArticleDto.getContents());
     }
 
+    public ResponseArticleDto findSingleArticle(Long articleId, String clientIp){
+        Article searchedArticle = articleRepository.findById(articleId).orElseThrow(() -> new EntityNotFoundException("해당 질문을 찾을 수 없습니다."));
+        Long recommendCount = articleRecommendRepository.countByArticleId(searchedArticle.getId());
+
+        if(redisService.checkFirstRequest(clientIp, searchedArticle.getId())){
+            searchedArticle.increaseReadCount();
+            redisService.writeClientRequest(clientIp, searchedArticle.getId());
+        }
+
+        return ResponseArticleDto.of(searchedArticle, recommendCount);
+    }
+
     public Page<Article> findAll(int page) {
         Pageable pageable = PageRequest.of(page, 15, Sort.by("createdAt").descending());
+
         return articleRepository.findAll(pageable);
     }
 
-    public Article findById(Long id){
-        return articleRepository.findById(id)
+    public Article findById(Long articleId){
+        return articleRepository.findById(articleId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 질문을 찾을 수 없습니다."));
     }
 
     public void delete(Article article) {
         articleRepository.delete(article);
     }
+
+
+
 }
