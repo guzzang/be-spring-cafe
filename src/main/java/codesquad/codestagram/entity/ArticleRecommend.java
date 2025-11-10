@@ -18,5 +18,23 @@ public class ArticleRecommend extends BaseTimeEntity {
     @JoinColumn(name = "ARTICLE_ID")
     private Article article;
 
+    public long getId() {
+        return id;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public Article getArticle() {
+        return article;
+    }
+
+    public ArticleRecommend(User user, Article article) {
+        this.user = user;
+        this.article = article;
+    }
+
+    protected ArticleRecommend() {}
 
 }
