@@ -4,11 +4,14 @@ package codesquad.codestagram.controller;
 import codesquad.codestagram.argumentresolver.RequestIp;
 import codesquad.codestagram.dto.RequestArticleDto;
 import codesquad.codestagram.dto.ResponseArticleDto;
+import codesquad.codestagram.dto.TemporaryArticleResponseDto;
 import codesquad.codestagram.entity.Article;
 import codesquad.codestagram.entity.Reply;
+import codesquad.codestagram.entity.TemporaryArticle;
 import codesquad.codestagram.entity.User;
 import codesquad.codestagram.service.ArticleService;
 import codesquad.codestagram.service.ReplyService;
+import codesquad.codestagram.service.TemporaryArticleService;
 import codesquad.codestagram.session.SessionConst;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.data.domain.Page;
@@ -20,10 +23,12 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 public class ArticleController {
 
+    private final TemporaryArticleService temporaryArticleService;
     private final ArticleService articleService;
     private final ReplyService replyService;
 
-    public ArticleController(ArticleService articleService, ReplyService replyService) {
+    public ArticleController(TemporaryArticleService temporaryArticleService, ArticleService articleService, ReplyService replyService) {
+        this.temporaryArticleService = temporaryArticleService;
         this.articleService = articleService;
         this.replyService = replyService;
     }
@@ -47,6 +52,113 @@ public class ArticleController {
         articleService.save(requestArticle);
         return "redirect:/";
     }
+
+    @PostMapping("/articles/recommend/{articleId}")
+    public String recommendArticle(@PathVariable Long articleId, HttpSession session) {
+        User loginUser = (User)session.getAttribute(SessionConst.LOGIN_USER);
+        if(loginUser == null){
+            return "user/login";
+        }
+        articleService.recommendArticle(loginUser.getId(), articleId);
+        return "redirect:/";
+    }
+
+    @PostMapping("/temporaryArticles")
+    public String writeTemporaryArticle(@ModelAttribute RequestArticleDto requestArticle, HttpSession session) {
+        User loginUser = (User)session.getAttribute(SessionConst.LOGIN_USER);
+        if(loginUser == null){
+            return "user/login";
+        }
+
+        temporaryArticleService.save(requestArticle);
+        return "redirect:/";
+    }
+
+    @GetMapping("/temporaryArticles")
+    public String getTemporaryArticles(HttpSession session, Model model) {
+        User loginUser = (User)session.getAttribute(SessionConst.LOGIN_USER);
+        if(loginUser == null){
+            return "user/login";
+        }
+        TemporaryArticleResponseDto temporaryArticleResponse = temporaryArticleService.findTemporaryArticles(loginUser.getId());
+        model.addAttribute("temporaryArticleResponseDto", temporaryArticleResponse);
+        return "article/temporaryArticles";
+    }
+
+    @GetMapping("/temporaryArticle/{id}")
+    public String getTemporaryArticle(@PathVariable Long id, HttpSession session, Model model) {
+        User loginUser = (User)session.getAttribute(SessionConst.LOGIN_USER);
+        if(loginUser == null){
+            return "user/login";
+        }
+        TemporaryArticle temporaryArticle = temporaryArticleService.findById(id);
+        model.addAttribute("temporaryArticle", temporaryArticle);
+        return "article/temporaryArticle";
+    }
+
+    @GetMapping("/temporaryArticles/edit/{temporaryArticleId}")
+    public String showTemporaryArticleEditForm(@PathVariable Long temporaryArticleId,
+                                      Model model,
+                                      HttpSession session,
+                                      RedirectAttributes redirectAttributes) {
+        User loginUser = (User) session.getAttribute(SessionConst.LOGIN_USER);
+
+        if(loginUser == null){
+            return "user/login";
+        }
+
+        TemporaryArticle temporaryArticle = temporaryArticleService.findById(temporaryArticleId);
+
+        if(loginUser.getId().equals(temporaryArticle.getUser().getId())){
+            model.addAttribute("temporaryArticle", temporaryArticle);
+            return "article/temporaryArticleEdit";
+        }
+
+        redirectAttributes.addFlashAttribute("errorMessage", "본인이 작성한 글만 수정할 수 있습니다.");
+        return "redirect:/temporaryArticles/" + temporaryArticleId;
+    }
+
+    @PutMapping("/temporaryArticles/{temporaryArticleId}")
+    public String editTemporaryArticle(@ModelAttribute RequestArticleDto editArticleInfo,
+                              @PathVariable Long temporaryArticleId,
+                              HttpSession session,
+                              RedirectAttributes redirectAttributes) {
+        User loginUser = (User) session.getAttribute(SessionConst.LOGIN_USER);
+        if(loginUser == null){
+            return "user/login";
+        }
+
+        TemporaryArticle temporaryArticle = temporaryArticleService.findById(temporaryArticleId);
+
+        if(loginUser.getId().equals(temporaryArticle.getUser().getId())){
+            temporaryArticleService.edit(temporaryArticleId, editArticleInfo);
+            return "redirect:/temporaryArticles/";
+        }
+
+        redirectAttributes.addFlashAttribute("errorMessage", "본인이 작성한 글만 수정할 수 있습니다.");
+        return "redirect:/temporaryArticle/" + temporaryArticleId;
+    }
+
+    @DeleteMapping("/temporaryArticles/{temporaryArticleId}")
+    public String deleteTemporaryArticle(@PathVariable Long temporaryArticleId,
+                                HttpSession session,
+                                RedirectAttributes redirectAttributes){
+        TemporaryArticle temporaryArticle = temporaryArticleService.findById(temporaryArticleId);
+        User loginUser = (User) session.getAttribute(SessionConst.LOGIN_USER);
+
+        if(loginUser == null){
+            return "user/login";
+        }
+
+        if(temporaryArticle.getUser().getId().equals(loginUser.getId())){
+            temporaryArticleService.delete(temporaryArticle);
+            return "redirect:/temporaryArticles";
+        }
+
+        redirectAttributes.addFlashAttribute("errorMessage", "본인이 작성한 글만 삭제할 수 있습니다.");
+        return "redirect:/temporaryArticle/" + temporaryArticleId;
+    }
+
 
     @GetMapping("/articles/edit/{articleId}")
     public String showArticleEditForm(@PathVariable Long articleId,
@@ -122,6 +234,8 @@ public class ArticleController {
 
         return "article/index";
     }
+
+
 
     @GetMapping("/articles/{id}")
     public String showArticle(@PathVariable Long id, @RequestIp String clientIp, @RequestParam(defaultValue = "0") int page, Model model){

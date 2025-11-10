@@ -3,6 +3,7 @@ package codesquad.codestagram.service;
 import codesquad.codestagram.dto.RequestArticleDto;
 import codesquad.codestagram.dto.ResponseArticleDto;
 import codesquad.codestagram.entity.Article;
+import codesquad.codestagram.entity.ArticleRecommend;
 import codesquad.codestagram.entity.User;
 import codesquad.codestagram.repository.ArticleRecommendRepository;
 import codesquad.codestagram.repository.ArticleRepository;
@@ -72,6 +73,14 @@ public class ArticleService {
         articleRepository.delete(article);
     }
 
+    public void recommendArticle(Long userId, Long articleId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("등록되어있지 않은 유저입니다."));
+        Article article = findById(articleId);
+        articleRecommendRepository.findByUserIdAndArticleId(user.getId(), article.getId())
+                .ifPresent(i -> {throw new IllegalStateException("이미 추천한 게시글입니다.");});
 
-
+        ArticleRecommend articleRecommend = new ArticleRecommend(user, article);
+        articleRecommendRepository.save(articleRecommend);
+    }
 }
