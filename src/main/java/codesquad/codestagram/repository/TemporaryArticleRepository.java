@@ -4,7 +4,12 @@ import codesquad.codestagram.entity.TemporaryArticle;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface TemporaryArticleRepository extends JpaRepository<TemporaryArticle, Long> {
+
+    List<TemporaryArticle> findAllByUserId(Long userId);
+
 
 }

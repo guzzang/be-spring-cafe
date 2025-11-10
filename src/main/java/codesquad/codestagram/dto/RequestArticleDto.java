@@ -1,6 +1,7 @@
 package codesquad.codestagram.dto;
 
 import codesquad.codestagram.entity.Article;
+import codesquad.codestagram.entity.TemporaryArticle;
 import codesquad.codestagram.entity.User;
 
 public class RequestArticleDto {
@@ -38,6 +39,10 @@ public class RequestArticleDto {
 
     public Article toArticle(User user){
         return new Article(writer, title, contents, user);
+    }
+
+    public TemporaryArticle toTemporaryArticle(User user){
+        return new TemporaryArticle(writer, title, contents, user);
     }
 
 }
