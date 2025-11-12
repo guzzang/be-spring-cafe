@@ -34,21 +34,12 @@ public class ArticleController {
     }
 
     @GetMapping("/articles")
-    public String getArticleForm(HttpSession session){
-        User loginUser = (User)session.getAttribute(SessionConst.LOGIN_USER);
-        if(loginUser == null){
-            return "user/login";
-        }
+    public String getArticleForm(){
         return "qna/form.html";
     }
 
     @PostMapping("/articles")
-    public String writeArticle(@ModelAttribute RequestArticleDto requestArticle, HttpSession session) {
-        User loginUser = (User)session.getAttribute(SessionConst.LOGIN_USER);
-        if(loginUser == null){
-            return "user/login";
-        }
-
+    public String writeArticle(@ModelAttribute RequestArticleDto requestArticle) {
         articleService.save(requestArticle);
         return "redirect:/";
     }
@@ -56,20 +47,12 @@ public class ArticleController {
     @PostMapping("/articles/recommend/{articleId}")
     public String recommendArticle(@PathVariable Long articleId, HttpSession session) {
         User loginUser = (User)session.getAttribute(SessionConst.LOGIN_USER);
-        if(loginUser == null){
-            return "user/login";
-        }
         articleService.recommendArticle(loginUser.getId(), articleId);
         return "redirect:/";
     }
 
     @PostMapping("/temporaryArticles")
-    public String writeTemporaryArticle(@ModelAttribute RequestArticleDto requestArticle, HttpSession session) {
-        User loginUser = (User)session.getAttribute(SessionConst.LOGIN_USER);
-        if(loginUser == null){
-            return "user/login";
-        }
-
+    public String writeTemporaryArticle(@ModelAttribute RequestArticleDto requestArticle) {
         temporaryArticleService.save(requestArticle);
         return "redirect:/";
     }
@@ -77,20 +60,13 @@ public class ArticleController {
     @GetMapping("/temporaryArticles")
     public String getTemporaryArticles(HttpSession session, Model model) {
         User loginUser = (User)session.getAttribute(SessionConst.LOGIN_USER);
-        if(loginUser == null){
-            return "user/login";
-        }
         TemporaryArticleResponseDto temporaryArticleResponse = temporaryArticleService.findTemporaryArticles(loginUser.getId());
         model.addAttribute("temporaryArticleResponseDto", temporaryArticleResponse);
         return "article/temporaryArticles";
     }
 
     @GetMapping("/temporaryArticle/{id}")
-    public String getTemporaryArticle(@PathVariable Long id, HttpSession session, Model model) {
-        User loginUser = (User)session.getAttribute(SessionConst.LOGIN_USER);
-        if(loginUser == null){
-            return "user/login";
-        }
+    public String getTemporaryArticle(@PathVariable Long id, Model model) {
         TemporaryArticle temporaryArticle = temporaryArticleService.findById(id);
         model.addAttribute("temporaryArticle", temporaryArticle);
         return "article/temporaryArticle";
@@ -102,10 +78,6 @@ public class ArticleController {
                                       HttpSession session,
                                       RedirectAttributes redirectAttributes) {
         User loginUser = (User) session.getAttribute(SessionConst.LOGIN_USER);
-
-        if(loginUser == null){
-            return "user/login";
-        }
 
         TemporaryArticle temporaryArticle = temporaryArticleService.findById(temporaryArticleId);
 
@@ -124,9 +96,6 @@ public class ArticleController {
                               HttpSession session,
                               RedirectAttributes redirectAttributes) {
         User loginUser = (User) session.getAttribute(SessionConst.LOGIN_USER);
-        if(loginUser == null){
-            return "user/login";
-        }
 
         TemporaryArticle temporaryArticle = temporaryArticleService.findById(temporaryArticleId);
 
@@ -146,10 +115,6 @@ public class ArticleController {
         TemporaryArticle temporaryArticle = temporaryArticleService.findById(temporaryArticleId);
         User loginUser = (User) session.getAttribute(SessionConst.LOGIN_USER);
 
-        if(loginUser == null){
-            return "user/login";
-        }
-
         if(temporaryArticle.getUser().getId().equals(loginUser.getId())){
             temporaryArticleService.delete(temporaryArticle);
             return "redirect:/temporaryArticles";
@@ -166,10 +131,6 @@ public class ArticleController {
                                       HttpSession session,
                                       RedirectAttributes redirectAttributes) {
         User loginUser = (User) session.getAttribute(SessionConst.LOGIN_USER);
-
-        if(loginUser == null){
-            return "user/login";
-        }
 
         Article article = articleService.findById(articleId);
 
@@ -188,9 +149,6 @@ public class ArticleController {
                               HttpSession session,
                               RedirectAttributes redirectAttributes) {
         User loginUser = (User) session.getAttribute(SessionConst.LOGIN_USER);
-        if(loginUser == null){
-            return "user/login";
-        }
 
         Article article = articleService.findById(articleId);
 
@@ -209,10 +167,6 @@ public class ArticleController {
                                 RedirectAttributes redirectAttributes){
         Article article = articleService.findById(articleId);
         User loginUser = (User) session.getAttribute(SessionConst.LOGIN_USER);
-
-        if(loginUser == null){
-            return "user/login";
-        }
 
         if(article.getUser().getId().equals(loginUser.getId())){
             articleService.delete(article);

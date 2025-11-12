@@ -104,7 +104,7 @@
                       <!-- 로그인하지 않은 경우 댓글을 숨기고, 로그인 안내 메시지 표시 -->
                       <th:block th:if="${session.loginUser == null}">
                           <p class="text-center text-danger">댓글을 보려면 로그인하세요.</p>
-                          <a href="/users/login" class="btn btn-primary">로그인</a>
+                          <a th:href="@{/users/login(redirectURL=${'/articles/' + article.getId()})}" class="btn btn-primary">로그인</a>
                       </th:block>
 
                       <div class="pagination">

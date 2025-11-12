@@ -23,14 +23,7 @@ public class ReplyController {
     }
 
     @PostMapping("/reply")
-    public String writeReply(@ModelAttribute RequestReplyDto requestReplyDto, HttpSession session){
-
-        User loginUser = (User) session.getAttribute(SessionConst.LOGIN_USER);
-
-        if(loginUser == null){
-            return "user/login";
-        }
-
+    public String writeReply(@ModelAttribute RequestReplyDto requestReplyDto){
         replyService.save(requestReplyDto);
         return "redirect:/articles/" + requestReplyDto.getArticleId();
     }
@@ -41,10 +34,6 @@ public class ReplyController {
         User loginUser = (User) session.getAttribute(SessionConst.LOGIN_USER);
 
         Reply reply = replyService.findByReplyId(replyId);
-
-        if(loginUser == null){
-            return "user/login";
-        }
 
         if(loginUser.getId().equals(reply.getUser().getId())){
             replyService.delete(reply);

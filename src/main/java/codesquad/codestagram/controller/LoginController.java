@@ -7,10 +7,12 @@ import codesquad.codestagram.session.SessionConst;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class LoginController {
@@ -22,7 +24,8 @@ public class LoginController {
     }
 
     @GetMapping("/users/login")
-    public String getLoginForm(){
+    public String getLoginForm(@RequestParam(defaultValue = "/") String redirectURL, Model model){
+        model.addAttribute("redirectURL", redirectURL);
         return "user/login";
     }
 
@@ -30,7 +33,8 @@ public class LoginController {
     @PostMapping("/users/login")
     public String login(@Valid @ModelAttribute LoginForm loginForm,
                         BindingResult bindingResult,
-                        HttpSession session){
+                        HttpSession session,
+                        @RequestParam(defaultValue = "/") String redirectURL){
 
         if(bindingResult.hasErrors()){
             return "user/login";
@@ -47,7 +51,7 @@ public class LoginController {
         // 2. 로그인 성공 -> 세션에 user 등록
         session.setAttribute(SessionConst.LOGIN_USER, user);
 
-        return "redirect:/";
+        return "redirect:" + redirectURL;
     }
 
     @PostMapping("users/logout")
