@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 public class ArticleRecommend extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @ManyToOne
