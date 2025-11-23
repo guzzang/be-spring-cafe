@@ -1,5 +1,6 @@
 package codesquad.codestagram.service;
 
+import codesquad.codestagram.repository.ArticleRecommendRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -10,6 +11,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 @SpringBootTest
 @Transactional
 @ActiveProfiles("local")
@@ -17,6 +20,9 @@ public class ArticleServiceTest {
 
     @Autowired
     private ArticleService articleService;
+
+    @Autowired
+    private ArticleRecommendRepository articleRecommendRepository;
 
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
@@ -28,7 +34,7 @@ public class ArticleServiceTest {
 
     @Test
     @DisplayName("게시글에 대한 첫번째 조회 요청 후에는 조회 기록이 남아야 한다.")
-    void firstSearchArticle(){
+    void firstSearchArticle() {
         //given
         //when
         articleService.findSingleArticle(1L, "111.111.111.111");
@@ -39,7 +45,7 @@ public class ArticleServiceTest {
 
     @Test
     @DisplayName("게시글에 대한 동일 ip의 중복된 조회 요청 후에는 하나의 조회 기록만 남아야 한다.")
-    void secondSearchSameArticle(){
+    void secondSearchSameArticle() {
         //given
         //when
         articleService.findSingleArticle(1L, "111.111.111.111");
@@ -50,7 +56,7 @@ public class ArticleServiceTest {
 
     @Test
     @DisplayName("게시글에 대한 다른 ip의 조회 요청 후에는 각각의 조회 기록이 남아야 한다.")
-    void SearchArticleByDifferentIp(){
+    void SearchArticleByDifferentIp() {
         //given
         //when
         articleService.findSingleArticle(1L, "000.000.000.000");
@@ -62,5 +68,26 @@ public class ArticleServiceTest {
         Assertions.assertThat(redisTemplate.hasKey("111.111.111.111:1")).isEqualTo(true);
         Assertions.assertThat(articleService.findById(1L).getReadCount()).isEqualTo(2);
     }
+
+    @Test
+    @DisplayName("게시글에 대한 첫 추천은 추천 기록이 남아야 한다.")
+    void recommendArticle() {
+        //given
+        //when
+        articleService.recommendArticle(1L, 1L);
+        //then
+        Assertions.assertThat(articleRecommendRepository.count()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("게시글에 대해 추천한 유저가 동일 게시글을 다시 추천하면 에러가 발생해야 한다.")
+    void sameUserRecommendSameArticle() {
+        //given
+        //when & then
+        articleService.recommendArticle(1L, 1L);
+        assertThrows(IllegalStateException.class, () -> articleService.recommendArticle(1L, 1L));
+    }
+
+
 
 }
