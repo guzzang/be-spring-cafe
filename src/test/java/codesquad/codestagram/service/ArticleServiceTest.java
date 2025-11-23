@@ -34,7 +34,7 @@ public class ArticleServiceTest {
 
     @Test
     @DisplayName("게시글에 대한 첫번째 조회 요청 후에는 조회 기록이 남아야 한다.")
-    void firstSearchArticle() {
+    void SearchArticleFirstTime() {
         //given
         //when
         articleService.findSingleArticle(1L, "111.111.111.111");
@@ -45,7 +45,7 @@ public class ArticleServiceTest {
 
     @Test
     @DisplayName("게시글에 대한 동일 ip의 중복된 조회 요청 후에는 하나의 조회 기록만 남아야 한다.")
-    void secondSearchSameArticle() {
+    void SearchSameArticle() {
         //given
         //when
         articleService.findSingleArticle(1L, "111.111.111.111");
@@ -71,7 +71,7 @@ public class ArticleServiceTest {
 
     @Test
     @DisplayName("게시글에 대한 첫 추천은 추천 기록이 남아야 한다.")
-    void recommendArticle() {
+    void recommendArticleFirstTime() {
         //given
         //when
         articleService.recommendArticle(1L, 1L);
