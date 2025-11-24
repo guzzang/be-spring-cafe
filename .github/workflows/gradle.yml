@@ -31,7 +31,8 @@ jobs:
     - name: application.properties 파일 설정
       run: |
         mkdir -p src/main/resources
-        echo "${{ secrets.APPLICATION_PROPERTIES }}" > ./src/main/resources/application-local.properties
+        echo "${{ secrets.APPLICATION_PROPERTIES }}" > ./src/main/resources/application.properties
+        echo "${{ secrets.APPLICATION_LOCAL_PROPERTIES }}" > ./src/main/resources/application-local.properties
         echo "${{ secrets.APPLICATION_DEPLOY_PROPERTIES }}" > ./src/main/resources/application-deploy.properties
         
     # Configure Gradle for optimal use in GitHub Actions, including caching of downloaded dependencies.
