@@ -32,6 +32,7 @@ jobs:
       run: |
         mkdir -p src/main/resources
         echo "${{ secrets.APPLICATION_PROPERTIES }}" > ./src/main/resources/application.properties
+        echo "${{ secrets.APPLICATION_DEPLOY_PROPERTIES }}" > ./src/main/resources/application-deploy.properties
         
     # Configure Gradle for optimal use in GitHub Actions, including caching of downloaded dependencies.
     # See: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
