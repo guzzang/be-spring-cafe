@@ -99,5 +99,6 @@ jobs:
         script: |
           cd /home/ec2-user
           sudo fuser -k -n tcp 8080 || true
-          sudo nohup java -jar springcafe.jar > ./output.log 2>&1 &
+          sudo nohup java -jar springcafe.jar --spring.profiles.active=deploy > ./output.log 2>&1 &
+
   
