@@ -49,7 +49,7 @@ jobs:
       run: mv ./build/libs/*SNAPSHOT.jar ./springcafe.jar
 
     - name: Make zip file
-      run: zip -r ./@GITHUB_SHA.zip .
+      run: zip -r ./$GITHUB_SHA.zip .
       
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v5
