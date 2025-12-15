@@ -17,8 +17,8 @@ public class RedisTest {
 
     @Test
     void redisConnectionTest(){
-        String key = "a";
-        String value = "1";
+        String key = "b";
+        String value = "2";
 
         ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
         valueOperations.set(key, value);
