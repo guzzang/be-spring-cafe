@@ -46,13 +46,13 @@ public class ArticleService {
         article.setContents(requestArticleDto.getContents());
     }
 
-    public ResponseArticleDto findSingleArticle(Long articleId, String clientIp){
+    public ResponseArticleDto findSingleArticle(Long articleId, String userId){
         Article searchedArticle = articleRepository.findById(articleId).orElseThrow(() -> new EntityNotFoundException("해당 질문을 찾을 수 없습니다."));
         Long recommendCount = articleRecommendRepository.countByArticleId(searchedArticle.getId());
 
-        if(redisService.checkFirstRequest(clientIp, searchedArticle.getId())){
+        if(userId != null && redisService.checkFirstRequest(userId, searchedArticle.getId())){
             searchedArticle.increaseReadCount();
-            redisService.writeClientRequest(clientIp, searchedArticle.getId());
+            redisService.writeClientRequest(userId, searchedArticle.getId());
         }
 
         return ResponseArticleDto.of(searchedArticle, recommendCount);

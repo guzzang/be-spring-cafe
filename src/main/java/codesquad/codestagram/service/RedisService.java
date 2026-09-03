@@ -15,21 +15,21 @@ public class RedisService {
         this.redisTemplate = redisTemplate;
     }
 
-    public boolean checkFirstRequest(String clientIp, Long articleId) {
-        String key = generateKey(clientIp, articleId);
+    public boolean checkFirstRequest(String userId, Long articleId) {
+        String key = generateKey(userId, articleId);
         if(redisTemplate.hasKey(key)) {
             return false;
         }
         return true;
     }
 
-    public void writeClientRequest(String clientIp, Long articleId) {
-        String key = generateKey(clientIp, articleId);
+    public void writeClientRequest(String userId, Long articleId) {
+        String key = generateKey(userId, articleId);
         redisTemplate.opsForValue().set(key, true, Duration.ofSeconds(requestExpireDurationSec));
     }
 
-    private String generateKey(String clientIp, Long articleId) {
-        return clientIp + ":" + articleId;
+    private String generateKey(String userId, Long articleId) {
+        return userId + ":" + articleId;
     }
 
 

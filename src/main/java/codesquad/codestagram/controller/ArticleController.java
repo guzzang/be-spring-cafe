@@ -1,7 +1,6 @@
 package codesquad.codestagram.controller;
 
 
-import codesquad.codestagram.argumentresolver.RequestIp;
 import codesquad.codestagram.dto.RequestArticleDto;
 import codesquad.codestagram.dto.ResponseArticleDto;
 import codesquad.codestagram.dto.TemporaryArticleResponseDto;
@@ -192,8 +191,9 @@ public class ArticleController {
 
 
     @GetMapping("/articles/{id}")
-    public String showArticle(@PathVariable Long id, @RequestIp String clientIp, @RequestParam(defaultValue = "0") int page, Model model){
-        ResponseArticleDto article = articleService.findSingleArticle(id, clientIp);
+    public String showArticle(@PathVariable Long id, HttpSession session,@RequestParam(defaultValue = "0") int page, Model model){
+        User user = (User) session.getAttribute(SessionConst.LOGIN_USER);
+        ResponseArticleDto article = articleService.findSingleArticle(id, user.getUserId());
         Page<Reply> replyList = replyService.findByArticleId(id, page);
 
         model.addAttribute("article", article.getArticle());
